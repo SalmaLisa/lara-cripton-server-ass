@@ -24,6 +24,13 @@ async function run() {
   try {
     const serviceCollection = client.db("laraCriptonDb").collection("services");
     const reviewCollection = client.db("laraCriptonDb").collection("reviews");
+
+    app.post("/services", async (req, res) => {
+      const service = req.body;
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
+
     app.get("/limitedServices", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
