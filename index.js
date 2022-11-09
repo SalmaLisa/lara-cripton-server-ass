@@ -49,11 +49,13 @@ async function run() {
     })
 
     app.get('/reviews', async (req, res) => {
-      const query = {};
-      // const options = {
-      //   sort: { "reviews.currentTime": -1 },
-      //   projection :{ _id: 0, currentTime: 1, reviews: 1 }
-      // }
+      let query = {};
+      console.log(req.query.email)
+      if (req.query.email) {
+        query = {
+          email:req.query.email
+        }
+      }
       const cursor = reviewCollection.find(query)
       const result = await cursor.toArray()
       res.send(result)
@@ -66,7 +68,7 @@ async function run() {
       const filteredReviews = reviews.filter(review=>review.serviceId===id)
       res.send(filteredReviews)
     })
-
+    
   }
   finally {
     
