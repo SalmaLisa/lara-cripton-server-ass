@@ -47,6 +47,26 @@ async function run() {
       const result = await reviewCollection.insertOne(review)
       res.send(result)
     })
+
+    app.get('/reviews', async (req, res) => {
+      const query = {};
+      // const options = {
+      //   sort: { "reviews.currentTime": -1 },
+      //   projection :{ _id: 0, currentTime: 1, reviews: 1 }
+      // }
+      const cursor = reviewCollection.find(query)
+      const result = await cursor.toArray()
+      res.send(result)
+    })
+    app.get('/reviews/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {};
+      const cursor = reviewCollection.find(query)
+      const reviews = await cursor.toArray()
+      const filteredReviews = reviews.filter(review=>review.serviceId===id)
+      res.send(filteredReviews)
+    })
+
   }
   finally {
     
