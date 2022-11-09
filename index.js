@@ -21,6 +21,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
   try {
     const serviceCollection = client.db('laraCriptonDb').collection('services')
+    const reviewCollection = client.db('laraCriptonDb').collection('reviews')
     app.get('/limitedServices', async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query)
@@ -35,10 +36,15 @@ async function run() {
     })
     app.get('/services/:id', async (req, res) => {
       const id = req.params.id;
-      console.log(id)
       const query = {_id:ObjectId(id)};
       const result = await serviceCollection.findOne(query)
-      console.log(result)
+      res.send(result)
+    })
+
+    //reviews
+    app.post('/reviews', async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review)
       res.send(result)
     })
   }
