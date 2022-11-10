@@ -4,6 +4,7 @@ const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
+var jwt = require("jsonwebtoken");
 
 //middleware
 app.use(cors());
@@ -12,6 +13,22 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("lara cripton server is ready to use");
 });
+
+//jwt verify
+function jwtVerify(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.status(401).send({ message: "unauthorized access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, function (err, decoded) {
+    if (err) {
+      res.status(401).send({ message: "unauthorized access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.t3mwvsa.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -25,6 +42,16 @@ async function run() {
     const serviceCollection = client.db("laraCriptonDb").collection("services");
     const reviewCollection = client.db("laraCriptonDb").collection("reviews");
 
+    //JWT
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.SECRET_ACCESS_TOKEN, {
+        expiresIn: "10h",
+      });
+      res.send({ token });
+    });
+
+    // services
     app.post("/services", async (req, res) => {
       const service = req.body;
       const result = await serviceCollection.insertOne(service);
@@ -57,7 +84,11 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/reviews", async (req, res) => {
+    app.get("/reviews", jwtVerify, async (req, res) => {
+      const email = req.decoded?.email;
+      if (email !== req.query.email) {
+        res.status(403).send({ message: "forbidden access" });
+      }
       let query = {};
       if (req.query.email) {
         query = {
