@@ -61,18 +61,18 @@ async function run() {
     app.get("/limitedServices", async (req, res) => {
       const query = {};
       const options = {
-        sort: {postTime:-1}
-      }
-      const cursor = serviceCollection.find(query,options);
+        sort: { postTime: -1 },
+      };
+      const cursor = serviceCollection.find(query, options);
       const result = await cursor.limit(3).toArray();
       res.send(result);
     });
     app.get("/services", async (req, res) => {
       const query = {};
       const options = {
-        sort: {postTime:-1}
-      }
-      const cursor = serviceCollection.find(query,options);
+        sort: { postTime: -1 },
+      };
+      const cursor = serviceCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -96,15 +96,15 @@ async function run() {
         res.status(403).send({ message: "forbidden access" });
       }
       const options = {
-        sort: {postTime:-1}
-      }
+        sort: { postTime: -1 },
+      };
       let query = {};
       if (req.query.email) {
         query = {
           email: req.query.email,
         };
       }
-      const cursor = reviewCollection.find(query,options);
+      const cursor = reviewCollection.find(query, options);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -112,10 +112,10 @@ async function run() {
       const id = req.params.id;
       const query = {};
       const options = {
-        sort: {postTime:-1}
-      }
-      const cursor = reviewCollection.find(query,options);
-      
+        sort: { postTime: -1 },
+      };
+      const cursor = reviewCollection.find(query, options);
+
       const reviews = await cursor.toArray();
       const filteredReviews = reviews.filter(
         (review) => review.serviceId === id
