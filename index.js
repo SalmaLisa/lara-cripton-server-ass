@@ -41,6 +41,7 @@ async function run() {
   try {
     const serviceCollection = client.db("laraCriptonDb").collection("services");
     const reviewCollection = client.db("laraCriptonDb").collection("reviews");
+    const appointments = client.db("laraCriptonDb").collection("appointments");
 
     //JWT
     app.post("/jwt", (req, res) => {
@@ -147,6 +148,13 @@ async function run() {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //appointments
+    app.post("/appointments", async (req, res) => {
+      const appointment = req.body;
+      const result = await appointments.insertOne(appointment);
       res.send(result);
     });
   } finally {
