@@ -39,6 +39,9 @@ const client = new MongoClient(uri, {
 });
 async function run() {
   try {
+    const allAccountsCollection = client
+      .db("laraCriptonDb")
+      .collection("allAccounts");
     const serviceCollection = client.db("laraCriptonDb").collection("services");
     const reviewCollection = client.db("laraCriptonDb").collection("reviews");
     const appointments = client.db("laraCriptonDb").collection("appointments");
@@ -51,7 +54,30 @@ async function run() {
       });
       res.send({ token });
     });
-
+    //store all accounts
+    app.post("/allAccounts", async (req, res) => {
+      const newlyCreatedAccount = req.body;
+      const result = await allAccountsCollection.insertOne(newlyCreatedAccount);
+      res.send(result);
+    });
+    //user verify
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const emailQuery = { userEmail: email };
+      const user = await allAccountsCollection.findOne(emailQuery);
+      if (user?.accountStatus === "user") {
+        res.send({ isUser: true });
+      }
+    });
+    //admin verify
+    app.get("/admin/:email", async (req, res) => {
+      const email = req.params.email;
+      const emailQuery = { userEmail: email };
+      const user = await allAccountsCollection.findOne(emailQuery);
+      if (user?.accountStatus === "admin") {
+        res.send({ isAdmin: true });
+      }
+    });
     // services
     app.post("/services", async (req, res) => {
       const service = req.body;
